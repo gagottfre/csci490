@@ -14,19 +14,19 @@ int main()
 
 	for(int i = 0; i < 100; i++)
 	{	
-		XTestFakeRelativeMotionEvent(display, 1, 1, 10);
+		XTestFakeRelativeMotionEvent(display, 1, 1, 100);
 	}
 	for(int i = 0; i < 100; i++)
 	{	
-		XTestFakeRelativeMotionEvent(display, 1, -1, 10);
+		XTestFakeRelativeMotionEvent(display, 1, -1, 100);
 	}
 	for(int i = 0; i < 100; i++)
 	{	
-		XTestFakeRelativeMotionEvent(display, -1, -1, 10);
+		XTestFakeRelativeMotionEvent(display, -1, -1, 100);
 	}
 	for(int i = 0; i < 100; i++)
 	{	
-		XTestFakeRelativeMotionEvent(display, -1, 1, 10);
+		XTestFakeRelativeMotionEvent(display, -1, 1, 100);
 	}
 
 	XFlush(display);
