@@ -66,11 +66,12 @@ void SampleListener::onFrame(const Controller& controller) {
             avgPos /= (float)fingers.count();
 
             int x = (avgPos.x > 0 ? 1 : -1);
-            //int y = (avgPos.y > 0 ? 1 : -1);
-            int xSpeed = -1;
+            int y = (avgPos.y > 230 ? -1 : 1);
+            int xSpeed = 0;
+            int ySpeed = 0;
             if(std::abs(avgPos.x) < 20)
             {
-                xSpeed = -1;
+                x = 0;
             }
             else if(std::abs(avgPos.x) < 50)
             {
@@ -85,13 +86,30 @@ void SampleListener::onFrame(const Controller& controller) {
                 xSpeed = 3;
             }
 
-            if(xSpeed != -1)
+            int yAdjustedPos = std::abs(avgPos.y - 230);
+            if(yAdjustedPos < 20)
             {
-                XTestFakeRelativeMotionEvent(display, x, 0, xSpeed);
+                y = 0;
             }
+            else if(yAdjustedPos < 50)
+            {
+                ySpeed = 20;
+            }
+            else if(yAdjustedPos < 100)
+            {
+                ySpeed = 7;
+            }
+            else
+            {
+                ySpeed = 3;
+            }
+
+            XTestFakeRelativeMotionEvent(display, x, 0, xSpeed);
+            XTestFakeRelativeMotionEvent(display, 0, y, ySpeed);
+
             XFlush(display);
-            //std::cout << "Hand has " << fingers.count()
-            //          << " fingers, average finger tip position" << avgPos.x << std::endl;
+            std::cout << "Hand has " << fingers.count()
+                      << " fingers, average finger tip position" << avgPos << std::endl;
         }
         /*
         // Get the hand's sphere radius and palm position
