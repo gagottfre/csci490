@@ -7,6 +7,7 @@
 using namespace Leap;
 
 Display *display;
+int lock = 0;
 
 class SampleListener : public Listener {
     public:
@@ -65,51 +66,95 @@ void SampleListener::onFrame(const Controller& controller) {
             }
             avgPos /= (float)fingers.count();
 
-            int x = (avgPos.x > 0 ? 1 : -1);
-            int y = (avgPos.y > 230 ? -1 : 1);
-            int xSpeed = 0;
-            int ySpeed = 0;
-            if(std::abs(avgPos.x) < 20)
-            {
-                x = 0;
-            }
-            else if(std::abs(avgPos.x) < 50)
-            {
-                xSpeed = 20;
-            }
-            else if(std::abs(avgPos.x) < 100)
-            {
-                xSpeed = 7;
-            }
-            else
-            {
-                xSpeed = 3;
-            }
+            int x = 8 * (avgPos.x / 300);
+            int y = -(8 * ((avgPos.y - 230) / 300));
+            int z = avgPos.z;
 
-            int yAdjustedPos = std::abs(avgPos.y - 230);
-            if(yAdjustedPos < 20)
-            {
-                y = 0;
-            }
-            else if(yAdjustedPos < 50)
-            {
-                ySpeed = 20;
-            }
-            else if(yAdjustedPos < 100)
-            {
-                ySpeed = 7;
-            }
-            else
-            {
-                ySpeed = 3;
-            }
+            XTestFakeRelativeMotionEvent(display, x, y, 0);
 
-            XTestFakeRelativeMotionEvent(display, x, 0, xSpeed);
-            XTestFakeRelativeMotionEvent(display, 0, y, ySpeed);
+            if(z < -25 && lock == 0)
+            {
+                lock = 90;
+                if(fingers.count() <= 2)
+                {
+                    XTestFakeButtonEvent(display, 1, true, 0);
+                    //XTestFakeButtonEvent(display, 1, false, 0);
+                }
+                else if(fingers.count() > 2 && fingers.count() <=4)
+                {
+                    XTestFakeButtonEvent(display, 1, true, 0);
+                    XTestFakeButtonEvent(display, 1, false, 0);
+                    XTestFakeButtonEvent(display, 1, true, 0);
+                    XTestFakeButtonEvent(display, 1, false, 0);
+                }
+                else if(fingers.count() > 4)
+                {
+                    XTestFakeButtonEvent(display, 3, true, 0);
+                    //XTestFakeButtonEvent(display, 3, false, 0);
+                }
 
+            }
+            if(z >= -25)
+            {
+                XTestFakeButtonEvent(display, 1, false, 0);
+                XTestFakeButtonEvent(display, 3, false, 0);
+            }
             XFlush(display);
+            if(lock > 0)
+            {
+                lock--;
+            }
             std::cout << "Hand has " << fingers.count()
-                      << " fingers, average finger tip position" << avgPos << std::endl;
+                << " fingers, average finger tip position" << avgPos << std::endl;
+
+
+            /*
+               int x = (avgPos.x > 0 ? 1 : -1);
+               int y = (avgPos.y > 230 ? -1 : 1);
+               int xSpeed = 0;
+               int ySpeed = 0;
+               if(std::abs(avgPos.x) < 20)
+               {
+               x = 0;
+               }
+               else if(std::abs(avgPos.x) < 50)
+               {
+               xSpeed = 20;
+               }
+               else if(std::abs(avgPos.x) < 100)
+               {
+               xSpeed = 7;
+               }
+               else
+               {
+               xSpeed = 3;
+               }
+
+               int yAdjustedPos = std::abs(avgPos.y - 230);
+               if(yAdjustedPos < 20)
+               {
+               y = 0;
+               }
+               else if(yAdjustedPos < 50)
+               {
+               ySpeed = 20;
+               }
+               else if(yAdjustedPos < 100)
+               {
+               ySpeed = 7;
+               }
+               else
+               {
+               ySpeed = 3;
+               }
+
+               XTestFakeRelativeMotionEvent(display, x, 0, xSpeed);
+               XTestFakeRelativeMotionEvent(display, 0, y, ySpeed);
+
+               XFlush(display);
+               std::cout << "Hand has " << fingers.count()
+               << " fingers, average finger tip position" << avgPos << std::endl;
+               */
         }
         /*
         // Get the hand's sphere radius and palm position
